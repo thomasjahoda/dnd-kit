@@ -1,6 +1,6 @@
 {
   "name": "@thomasjahoda-forks/dnd-kit-sortable",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Official sortable preset and sensors for dnd kit",
   "author": "Claudéric Demers",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "prepublish": "npm run build"
   },
   "main": "dist/index.js",
-  "module": "dist/sortable.esm.js",
+  "module": "dist/dnd-kit-sortable.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "README.md",
