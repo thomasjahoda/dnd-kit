@@ -23,23 +23,23 @@ export function useRect(
       if (!element) {
         return null;
       }
-  
+
       if (element.isConnected === false) {
         // Fall back to last rect we measured if the element is
         // no longer connected to the DOM.
         return currentRect ?? fallbackRect ?? null;
       }
-  
+
       const newRect = measure(element);
-  
+
       if (JSON.stringify(currentRect) === JSON.stringify(newRect)) {
         return currentRect;
       }
-  
+
       return newRect;
     });
   }
-  
+
   const mutationObserver = useMutationObserver({
     callback(records) {
       if (!element) {

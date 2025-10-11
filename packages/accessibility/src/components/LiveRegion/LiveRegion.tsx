@@ -22,7 +22,7 @@ export function LiveRegion({id, announcement, ariaLiveType = "assertive"}: Props
     clipPath: 'inset(100%)',
     whiteSpace: 'nowrap',
   };
-  
+
   return (
     <div
       id={id}

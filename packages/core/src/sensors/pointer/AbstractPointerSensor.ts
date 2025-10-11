@@ -190,7 +190,7 @@ export class AbstractPointerSensor implements SensorInstance {
       // Prevent further text selection while dragging
       this.documentListeners.add(
         EventName.SelectionChange,
-        this.removeTextSelection
+        () => this.removeTextSelection(),
       );
 
       onStart(initialCoordinates);

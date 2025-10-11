@@ -34,6 +34,11 @@ export interface Arguments
   getNewIndex?: NewIndexGetter;
   strategy?: SortingStrategy;
   transition?: SortableTransition | null;
+  /**
+   * PATCHED: only get ~10 items after current sortable as potential resizeObserverConfig (to not have to observe all items, potentially thousands. Lots of memory saved). Was one of the main-culprits when having a lot of items (2k items in queue. I know that will decrease to ~50, but other sortable contexts may have much more items again).
+   * default: 10
+   */
+  maxItemCountToObserveAfterCurrentItem?: number;
 }
 
 export function useSortable({
@@ -46,9 +51,11 @@ export function useSortable({
   strategy: localStrategy,
   resizeObserverConfig,
   transition = defaultTransition,
+  maxItemCountToObserveAfterCurrentItem = 10,
 }: Arguments) {
   const {
     items,
+    getIndexForItemId,
     containerId,
     activeIndex,
     disabled: globalDisabled,
@@ -58,19 +65,18 @@ export function useSortable({
     useDragOverlay,
     strategy: globalStrategy,
   } = useContext(Context);
-  const disabled: Disabled = normalizeLocalDisabled(
+  const disabled: Disabled = useNormalizeLocalDisabled(
     localDisabled,
     globalDisabled
   );
-  const index = items.indexOf(id);
+  const index = useMemo(() => getIndexForItemId(id), [getIndexForItemId, id]);
   const data = useMemo<SortableData & Data>(
     () => ({sortable: {containerId, index, items}, ...customData}),
     [containerId, customData, index, items]
   );
-  const itemsAfterCurrentSortable = useMemo(
-    () => items.slice(items.indexOf(id)),
-    [items, id]
-  );
+  const itemsAfterCurrentSortable = useMemo(() => {
+    return items.slice(index, index + maxItemCountToObserveAfterCurrentItem);
+  }, [items, index, maxItemCountToObserveAfterCurrentItem]);
   const {
     rect,
     node,
@@ -80,10 +86,13 @@ export function useSortable({
     id,
     data,
     disabled: disabled.droppable,
-    resizeObserverConfig: {
-      updateMeasurementsFor: itemsAfterCurrentSortable,
-      ...resizeObserverConfig,
-    },
+    resizeObserverConfig: useMemo(
+      () => ({
+        updateMeasurementsFor: itemsAfterCurrentSortable,
+        ...resizeObserverConfig,
+      }),
+      [resizeObserverConfig, itemsAfterCurrentSortable]
+    ),
   });
   const {
     active,
@@ -243,20 +252,22 @@ export function useSortable({
   }
 }
 
-function normalizeLocalDisabled(
+function useNormalizeLocalDisabled(
   localDisabled: Arguments['disabled'],
   globalDisabled: Disabled
 ) {
-  if (typeof localDisabled === 'boolean') {
-    return {
-      draggable: localDisabled,
-      // Backwards compatibility
-      droppable: false,
-    };
-  }
+  return useMemo(() => {
+    if (typeof localDisabled === 'boolean') {
+      return {
+        draggable: localDisabled,
+        // Backwards compatibility
+        droppable: false,
+      };
+    }
 
-  return {
-    draggable: localDisabled?.draggable ?? globalDisabled.draggable,
-    droppable: localDisabled?.droppable ?? globalDisabled.droppable,
-  };
+    return {
+      draggable: localDisabled?.draggable ?? globalDisabled.draggable,
+      droppable: localDisabled?.droppable ?? globalDisabled.droppable,
+    };
+  }, [localDisabled, globalDisabled]);
 }

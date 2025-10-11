@@ -17,16 +17,17 @@ export const defaultSensors = [
 
 export const defaultData: DataRef = {current: {}};
 
-export const defaultMeasuringConfiguration: DeepRequired<MeasuringConfiguration> = {
-  draggable: {
-    measure: getTransformAgnosticClientRect,
-  },
-  droppable: {
-    measure: getTransformAgnosticClientRect,
-    strategy: MeasuringStrategy.WhileDragging,
-    frequency: MeasuringFrequency.Optimized,
-  },
-  dragOverlay: {
-    measure: getClientRect,
-  },
-};
+export const defaultMeasuringConfiguration: DeepRequired<MeasuringConfiguration> =
+  {
+    draggable: {
+      measure: getTransformAgnosticClientRect,
+    },
+    droppable: {
+      measure: getTransformAgnosticClientRect,
+      strategy: MeasuringStrategy.WhileDragging,
+      frequency: MeasuringFrequency.Optimized,
+    },
+    dragOverlay: {
+      measure: getClientRect,
+    },
+  };
