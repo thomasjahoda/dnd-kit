@@ -51,6 +51,8 @@ export const Context = React.createContext<ContextDescriptor>({
   },
 });
 
+Context.displayName = 'SortableContext';
+
 export function SortableContext({
   children,
   id,
